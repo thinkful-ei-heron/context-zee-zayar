@@ -13,7 +13,7 @@ class Note extends Component {
                 <h3>{this.props.name}</h3>
                 <p>Date modified on {(new Date(this.props.content)).toDateString()}</p>
                 </Link>
-                <button onClick={() => this.context.deleteNote(this.props.id)}>Delete Note</button>
+                <button onClick={() => { this.context.deleteNote(this.props.id) }}>Delete Note</button>
             </div>
         );
     }

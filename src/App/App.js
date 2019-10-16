@@ -1,20 +1,27 @@
 import React, {Component} from 'react';
 import {Link, Route, Switch} from 'react-router-dom'
 import './App.css';
-// import dummyStore from '../dummy-store';
 import FolderList from "../FolderList/FolderList";
 import NoteList from "../NoteList/NoteList";
-// import Folder from "../Folder/Folder";
 import DetailedNote from "../DetailedNote/DetailedNote";
 import DataContext from '../DataContext';
+
 
 class App extends Component {
     static contextType = DataContext
     state = {
         notes: [],
         folders: [],
+        redirect: () => {
+            this.props.history.push(`/`)
+        },
         deleteNote: noteId => {
-            this.apiDeleteNote(noteId).then(()=> this.fetchData())
+            let newnotes = this.state.notes.filter(note => note.id !== noteId)
+            this.setState({
+                ...this.state,
+                notes: newnotes
+            })
+            this.apiDeleteNote(noteId).then(response => this.processResponse(response)).then(() => console.log(`${noteId} successfully deleted.`))
         }
     };
 
@@ -23,12 +30,20 @@ class App extends Component {
         return fetch(`http://localhost:9090/notes/${noteId}`, { method: 'DELETE' }) 
     }
 
+    processResponse(response) {
+        if (response.ok) {
+            return response.json()
+        } else {
+            throw new Error(response.status)
+        }
+    }
+
     fetchData() {
         
-        let folderPromise = fetch('http://localhost:9090/folders').then(response => response.json())
+        let folderPromise = fetch('http://localhost:9090/folders').then(response => this.processResponse(response))
             .catch(err => console.log(err))
     
-        let notePromise = fetch('http://localhost:9090/notes').then(response => response.json())
+        let notePromise = fetch('http://localhost:9090/notes').then(response => this.processResponse(response))
             .catch(err => console.log(err))
         
         Promise.all([folderPromise, notePromise]).then(results => this.setState({
