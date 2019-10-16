@@ -1,13 +1,15 @@
 import React, {Component} from 'react';
 import '../App/App.css';
 import Note from "../Note/Note";
+import DataContext from '../DataContext'
 
 class NotesList extends Component {
+    static contextType = DataContext
     render() {
         const currentFolderID = this.props.folderId;
-        let notes = this.props.notes;
+        let notes = this.context.notes;
         if(currentFolderID) {
-            notes = this.props.notes.filter((note) => note.folderId === (currentFolderID));
+            notes = this.context.notes.filter((note) => note.folderId === (currentFolderID));
         }
         return <>
             {notes.map(note =>
